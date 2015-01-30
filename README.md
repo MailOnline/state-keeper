@@ -71,8 +71,8 @@ There are a few shortcut available:
 
 Now you should start realizing how this thing can be useful. With a simple declarative syntax we are able to keep track of the various state of the videoPlayer!
 
-event
------
+Event object
+------------
 Event is the argument passed to the function. It contains 3 properties:
 
   - type: "enter" or "leave"
@@ -80,7 +80,7 @@ Event is the argument passed to the function. It contains 3 properties:
   - event: the original event object that triggered the state change
 
 More complex transition conditions
-==================================
+----------------------------------
 There are few cases where you want be able to define more complicated transition conditions.
 
     var state = StateKeeper(videoPlayer, {
@@ -127,7 +127,7 @@ In case I get a "stop" event from the videoPlayer I check the current state (it 
 The function also gets the subject (videoPlayer in this case) as "this", in this example I check if the video is finished playing, in this case I transition to the "ended" state, in the other case I get to the "ready" state.
 
 Initial state
-=============
+-------------
 The initial state is the string "ready" by default but you can change it in the options:
 
     var state = StateKeeper(videoPlayer, {
@@ -138,7 +138,7 @@ The initial state is the string "ready" by default but you can change it in the 
     });
 
 Using an object
-===============
+---------------
 Until now I have used a simple string as event. In reality you could use an object. This will allow to do something a bit more complex:
 
     var state = StateKeeper(videoPlayer, {
@@ -157,7 +157,7 @@ A state object is a plain old js object containing a property "name" (this is re
 The "from" can also be defined as "object" or as a function taking the previous state as argument.
 
 More than one observable
-========================
+------------------------
 StateKeeper is able to keep track of many different observables. You can do this passing, instead of a single object, a map of observables (label: observable). You can then use the label for telling what event of what observable you should listen to:
 
     var state = StateKeeper({video1: videoPlayer1, video2: videoplayer2}, {
@@ -178,12 +178,12 @@ StateKeeper is able to keep track of many different observables. You can do this
 
 In this example I am listening to 2 different video players for having available a state that is the combination of them.
 
-destroy
-=======
-Statekeeper attaches event handlers to do its job. If you don't use it anymore you should call the destroy method for freeing the resources.
+Cleaning up
+-----------
+Statekeeper attaches event handlers to do its job. If you don't use it anymore you should call the "destroy" method for freeing the resources.
 
-bindMethod/unbindMethod
-=======================
+bindMethod / unbindMethod
+-------------------------
 StateKeeper uses '.on' to listen for events on the subject. You can change the default method with the options:
 
     var videoPlayer = document.getElementsByTagName('video')[0];
