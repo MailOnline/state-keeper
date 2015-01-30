@@ -1,0 +1,22 @@
+{
+  "name": "state-keeper",
+  "main": "src/state-keeper.js",
+  "version": "0.0.1",
+  "homepage": "https://github.com/sithmel/state-keeper",
+  "authors": [
+    "Maurizio Lupo <maurizio.lupo@gmail.com>"
+  ],
+  "description": "state-keeper keeps track of the state of one or more observables",
+  "keywords": [
+    "state",
+    "state-machine",
+  ],
+  "license": "gpl-mit",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

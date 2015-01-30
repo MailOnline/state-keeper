@@ -1,0 +1,15 @@
+{
+  "name": "state-keeper",
+  "version": "0.0.1",
+  "description": "state-keeper keeps track of the state of one or more observables",
+  "main": "src/state-keeper.js",
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha tests/*.js"
+  },
+  "author": "Maurizio Lupo <maurizio.lupo@gmail.com>",
+  "license": "GPL-MIT",
+  "devDependencies": {
+    "chai": "^1.10.0",
+    "mocha": "^2.1.0"
+  }
+}
