@@ -11,7 +11,7 @@
     "state",
     "state-machine",
   ],
-  "license": "gpl-mit",
+  "license": "mit",
   "ignore": [
     "**/.*",
     "node_modules",
