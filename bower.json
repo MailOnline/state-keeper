@@ -9,7 +9,7 @@
   "description": "state-keeper keeps track of the state of one or more observables",
   "keywords": [
     "state",
-    "state-machine",
+    "state-machine"
   ],
   "license": "mit",
   "ignore": [

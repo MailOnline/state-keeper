@@ -1,7 +1,8 @@
 StateKeeper
 ===========
 
-StateKeeper is a simple but customizable state machine. It observes one or more observables (sorry for the pun) and use their events to transition to different states (a state can be as simple as a string).
+StateKeeper is a simple but customizable state machine. Compared to other state machines, it works in a slightly different way:
+It observes one or more observables (sorry for the pun) and use their events to transition to different states (a state can be as simple as a string).
 
 It can be pretty useful for abstracting a complex state from basic low level events. If you are confused at this point don't worry, everything will become clear in a few lines.
 
