@@ -17,13 +17,13 @@ function getStateString(s){
   return isString(s) ? s : s.name;
 }
 
-function test(from, st){
+function test(from, st, evt){
   var stateName = getStateString(st);
   if (from instanceof RegExp){ // regexp
     return from.test(stateName);
   }
   else if (typeof from === "function") {
-    return from.call(this, st);
+    return from.call(this, st, evt);
   }
   else if (isString(from)){
     return from === stateName;
@@ -33,9 +33,9 @@ function test(from, st){
   }
 }
 
-function changeState(to, st){
+function changeState(to, st, evt){
   if (typeof to === "function") {
-    return to.call(this, st);
+    return to.call(this, st, evt);
   }
   else if (isValidState(to)){
     return to;
@@ -84,12 +84,12 @@ function StateKeeper (subject, transitions, options) {
         }
 
         for(i = 0; i < s.length; i++){
-          if (test.call(sub, s[i].from, currentState)){
+          if (test.call(sub, s[i].from, currentState, evt)){
 
             // left old state
             run.call(this, 'leave');
 
-            currentState = changeState.call(sub, s[i].to, currentState);
+            currentState = changeState.call(sub, s[i].to, currentState, evt);
             checkState(currentState);
 
             run.call(this, 'enter');

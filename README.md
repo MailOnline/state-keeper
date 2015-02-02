@@ -109,13 +109,13 @@ I can also use a function to do even more complex stuff:
       ],
       stop: [
         {
-          from: function (currentState){
+          from: function (currentState, evt){
             return currentState === "playing" && this.duration === this.currentTime;
           },
           to: 'ended'
         },
         {
-          from: function (currentState){
+          from: function (currentState, evt){
             return currentState === "playing" && this.duration !== this.currentTime;
           },
           to: 'ready'
@@ -125,6 +125,7 @@ I can also use a function to do even more complex stuff:
 
 In this example I have used a function for deciding if I should transition to the "ended" state.
 In case I get a "stop" event from the videoPlayer I check the current state (it is passed as argument to the function).
+The other argument is the original event object as it is passed by the function callback.
 The function also gets the subject (videoPlayer in this case) as "this", in this example I check if the video is finished playing, in this case I transition to the "ended" state, in the other case I get to the "ready" state.
 
 Initial state
@@ -145,8 +146,8 @@ Until now I have used a simple string as event. In reality you could use an obje
     var state = StateKeeper(videoPlayer, {
       play: [
         {from:"ready",   to: {name: "playing", number: 1}},
-        {from:"playing", to: function (state){return {name: "paused",  number: state.number};}},
-        {from:"paused",  to: function (state){return {name: "playing", number: state.number + 1};}}
+        {from:"playing", to: function (state, evt){return {name: "paused",  number: state.number};}},
+        {from:"paused",  to: function (state, evt){return {name: "playing", number: state.number + 1};}}
       ]
     });
 
