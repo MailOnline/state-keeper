@@ -48,8 +48,20 @@ function changeState(to, st, evt){
 function StateKeeper (subject, transitions, options) {
   options = options || {};
   var currentState = options.initialState || "ready";
+  var newstate;
   var bind = options.bindMethod || 'on';
   var unbind = options.unbindMethod || 'off';
+
+  function run(enter_leave, currentState, evt){
+    var cbs = [].concat(callbacks[enter_leave + '.' + getStateString(currentState)] || [],
+                        callbacks['*.*'] || [],
+                        callbacks[enter_leave + '.*'] || [],
+                        callbacks['*.' + getStateString(currentState)] || []);
+
+    for (var c = 0; c < cbs.length; c++){
+      cbs[c].call(this, {type: enter_leave, state: currentState , event: evt});
+    }
+  }
 
   checkState(currentState);
 
@@ -62,6 +74,8 @@ function StateKeeper (subject, transitions, options) {
   }
 
   var callbacks = {};
+  var queue = [];
+  var interval;
 
   for (var transition in transitions){
     t = transition.split(':');
@@ -72,33 +86,27 @@ function StateKeeper (subject, transitions, options) {
 
     sub[bind](t[1], (function (s, sub){
       return function (evt){
-        var i;
-
-        function run(enter_leave){
-          var cbs = [].concat(callbacks[enter_leave + '.' + getStateString(currentState)] || [],
-                              callbacks['*.*'] || [],
-                              callbacks[enter_leave + '.*'] || []);
-          for (var c = 0; c < cbs.length; c++){
-            cbs[c].call(this, {type: enter_leave, state: currentState , event: evt});
-          }
-        }
-
-        for(i = 0; i < s.length; i++){
-          if (test.call(sub, s[i].from, currentState, evt)){
-
-            // left old state
-            run.call(this, 'leave');
-
-            currentState = changeState.call(sub, s[i].to, currentState, evt);
-            checkState(currentState);
-
-            run.call(this, 'enter');
-            break;
-          }
-        }
+        queue.unshift({subject: sub, evt: evt, states: s});
       };
     }(transitions[transition], sub) ));
   }
+
+  interval = setInterval(function emptyQueue(){
+    var stateChange;
+    while(stateChange = queue.pop()){
+      var s = stateChange.states;
+      for(var i = 0; i < s.length; i++){
+        if (test.call(stateChange.subject, s[i].from, currentState, stateChange.evt)){
+          // left old state
+          run.call(stateChange.subject, 'leave', currentState, stateChange.evt);
+          currentState = changeState.call(sub, s[i].to, currentState, stateChange.evt);
+          run.call(stateChange.subject, 'enter', currentState, stateChange.evt);
+          break;
+        }
+      }
+    }
+  },0);
+
 
   return {
     get: function (){
@@ -134,6 +142,7 @@ function StateKeeper (subject, transitions, options) {
 
         sub[unbind](t[1]);
       }
+      if (interval) clearInterval(interval);
     }
   };
 }
