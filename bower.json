@@ -2,7 +2,7 @@
   "name": "state-keeper",
   "main": "src/state-keeper.js",
   "version": "0.0.1",
-  "homepage": "https://github.com/sithmel/state-keeper",
+  "homepage": "https://github.com/MailOnline/state-keeper",
   "authors": [
     "Maurizio Lupo <maurizio.lupo@gmail.com>"
   ],
