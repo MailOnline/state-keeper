@@ -2,7 +2,7 @@ StateKeeper
 ===========
 
 StateKeeper is a simple but customizable state machine. Compared to other state machines, it works in a slightly different way:
-It observes one or more observables (sorry for the pun) and use their events to transition to different states (a state can be as simple as a string).
+It observes one or more observables (sorry for the pun) and uses their events to transition to different states (a state can be as simple as a string).
 
 It can be pretty useful for abstracting a complex state from basic low level events. If you are confused at this point don't worry, everything will become clear in a few lines.
 
@@ -19,7 +19,7 @@ In the next examples I will use the default jQuery object containing ".on" and "
 
 Simple Example
 ==============
-In this example videoPlayer is an observable that fires a "play" event every time someone clicks on play. I can configure StateKeeper to keep track of the state of the player::
+In this example videoPlayer is an observable that fires a "play" event every time someone clicks on play. I can configure StateKeeper to keep track of the state of the player:
 
     var state = StateKeeper(videoPlayer, {
       play: [
@@ -30,10 +30,10 @@ In this example videoPlayer is an observable that fires a "play" event every tim
     });
 
 StateKeeper takes as parameters the observable (videoPlayer) and a map of transitions (optionally an options object).
-For each transition (fired by the observable) I have a list of state change.
+For each transition (fired by the observable) I have a list of state changes.
 In this example when the subject fires the event "play" I can change the state from "ready" (the default initial state) to "playing", from "playing" to "paused" and the other way around.
 Any other event will be ignored, for example there is no way to getting back to the initial "ready" state.
-Let's see what happen when videoPlayer fires events::
+Let's see what happen when videoPlayer fires events:
 
     videoPlayer.trigger('play');
     state.get() === "playing"
@@ -43,13 +43,13 @@ Let's see what happen when videoPlayer fires events::
     state.get() === "playing"
 
 "get" is the method to call if you want to get the current state.
-You can do something when you enter into a state::
+You can do something when you enter into a state:
 
     state.on('enter.playing', function (event){
       console.log('The player is ... ehm ... playing')
     });
 
-You can also do something else when you are leaving a state::
+You can also do something else when you are leaving a state:
 
     state.on('leave.playing', function (event){
       console.log('The player is paused')
@@ -59,14 +59,14 @@ You can also do something else when you are leaving a state::
       console.log('The player is activated for the first time')
     });
 
-With "on" you can attach a function when the state change. A stateKeeper instance fires an event called "enter.statename" when it enter in a new state and "leave.statename" when is leaving a state.
-There are a few shortcut available:
+With "on" you can attach a function when the state changes. A stateKeeper instance fires an event called "enter.statename" when it enters a new state and "leave.statename" when it is leaving a state.
+There are a few shortcuts available:
 
   - "*.statename" will run the function for "enter.statename" and "leave.statename"
-  - "enter.*" will run the function every time it transition to a new state
+  - "enter.*" will run the function every time it transitions to a new state
   - "leave.*" will run the function every time it is leaving a state
   - "*.*" will run the function for any state, when it is entering and leaving
-  - omitting the first argument it is equivalent to using "*.*"
+  - omitting the first argument is equivalent to using "*.*"
   - "statename" is the same as "enter.statename"
   - "*" is the same as "enter.*"
 
@@ -124,9 +124,10 @@ I can also use a function to do even more complex stuff:
     });
 
 In this example I have used a function for deciding if I should transition to the "ended" state.
-In case I get a "stop" event from the videoPlayer I check the current state (it is passed as argument to the function).
+If I get a "stop" event from the videoPlayer then I check the current state (it is passed as an argument to the function).
 The other argument is the original event object as it is passed by the function callback.
-The function also gets the subject (videoPlayer in this case) as "this", in this example I check if the video is finished playing, in this case I transition to the "ended" state, in the other case I get to the "ready" state.
+The function also gets the subject (videoPlayer in this case) as "this".
+I check if the video has finished playing, in which case I transition to the "ended" state. Otherwise I go to the "ready" state.
 
 Initial state
 -------------
@@ -141,7 +142,7 @@ The initial state is the string "ready" by default but you can change it in the 
 
 Using an object
 ---------------
-Until now I have used a simple string as event. In reality you could use an object. This will allow to do something a bit more complex:
+Until now I have used a simple string as event. In reality you could use an object. This will allow us to do something a bit more complex:
 
     var state = StateKeeper(videoPlayer, {
       play: [
@@ -155,12 +156,12 @@ Until now I have used a simple string as event. In reality you could use an obje
       console.log("Playing for " + evt.state.number + " times");
     });
 
-A state object is a plain old js object containing a property "name" (this is required). This property will be used any times a string is expected (triggering events, transitioning from string/regexp).
+A state object is a plain old js object containing a property "name" (this is required). This property will be used any time a string is expected (triggering events, transitioning from string/regexp).
 The "from" can also be defined as "object" or as a function taking the previous state as argument.
 
 More than one observable
 ------------------------
-StateKeeper is able to keep track of many different observables. You can do this passing, instead of a single object, a map of observables (label: observable). You can then use the label for telling what event of what observable you should listen to:
+StateKeeper is able to keep track of many different observables. You can do this by passing, instead of a single object, a map of observables {label: observable}. You can then use the label to tell what event of what observable you should listen to:
 
     var state = StateKeeper({video1: videoPlayer1, video2: videoplayer2}, {
       "video1:play": [
@@ -178,7 +179,7 @@ StateKeeper is able to keep track of many different observables. You can do this
     });
 
 
-In this example I am listening to 2 different video players for having available a state that is the combination of them.
+In this example I am listening to 2 different video players so that I have available a state that is the combination of them.
 
 Cleaning up
 -----------
