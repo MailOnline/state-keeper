@@ -1,6 +1,7 @@
 (function (){
 "use strict";
 
+
 function isString(s){
   return (typeof s === "string" ) || (s instanceof String);
 }
@@ -48,7 +49,7 @@ function changeState(to, st, evt){
 function StateKeeper (subject, transitions, options) {
   options = options || {};
   var currentState = options.initialState || "ready";
-  var newstate;
+  var oldState;
   var bind = options.bindMethod || 'on';
   var unbind = options.unbindMethod || 'off';
 
@@ -86,27 +87,24 @@ function StateKeeper (subject, transitions, options) {
 
     sub[bind](t[1], (function (s, sub){
       return function (evt){
-        queue.unshift({subject: sub, evt: evt, states: s});
+        for(var i = 0; i < s.length; i++){
+          if (test.call(sub, s[i].from, currentState, evt)){
+            oldState = currentState;
+            currentState = changeState.call(sub, s[i].to, currentState, evt);
+
+            setImmediate((function (sub, oldState, currentState, evt){
+              return function (){
+                run.call(sub, 'leave', oldState, evt);
+                run.call(sub, 'enter', currentState, evt);
+              };
+            }(sub, oldState, currentState, evt)));
+
+            break;
+          }
+        }
       };
     }(transitions[transition], sub) ));
   }
-
-  interval = setInterval(function emptyQueue(){
-    var stateChange;
-    while(stateChange = queue.pop()){
-      var s = stateChange.states;
-      for(var i = 0; i < s.length; i++){
-        if (test.call(stateChange.subject, s[i].from, currentState, stateChange.evt)){
-          // left old state
-          run.call(stateChange.subject, 'leave', currentState, stateChange.evt);
-          currentState = changeState.call(sub, s[i].to, currentState, stateChange.evt);
-          run.call(stateChange.subject, 'enter', currentState, stateChange.evt);
-          break;
-        }
-      }
-    }
-  },0);
-
 
   return {
     get: function (){

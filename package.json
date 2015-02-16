@@ -12,5 +12,8 @@
   "devDependencies": {
     "chai": "^1.10.0",
     "mocha": "^2.1.0"
+  },
+  "dependencies": {
+    "setimmediate": "^1.0.2"
   }
 }

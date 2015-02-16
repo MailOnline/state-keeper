@@ -1,5 +1,6 @@
 var StateKeeper = require('../src/state-keeper');
 var assert = require('chai').assert;
+require("setimmediate")
 // mock
 var Subject = function (){
   var cbs = {};
