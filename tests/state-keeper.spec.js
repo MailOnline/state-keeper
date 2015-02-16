@@ -371,34 +371,34 @@ describe("must throw an error if the state is not valid", function () {
 
   });
 
-  // it("transition to an invalid object", function () {
-  //   var sub = Subject();
-  //   var wf = StateKeeper(sub, {
-  //     play: [
-  //       {from:"ready",   to: {number: 1}},
-  //     ]
-  //   });
-  //
-  //   assert.throws(function (){
-  //      sub.trigger('play');
-  //   });
-  //
-  // });
-  //
-  // it("transition to a undefined", function () {
-  //   var sub = Subject();
-  //   var wf = StateKeeper(sub, {
-  //     play: [
-  //   {from:"ready",   to: function (){}},
-  //     ]
-  //   });
-  //
-  //   assert.throws(function (){
-  //      sub.trigger('play')
-  //   });
-  //
-  // });
-  //
+  it("transition to an invalid object", function () {
+    var sub = Subject();
+    var wf = StateKeeper(sub, {
+      play: [
+        {from:"ready",   to: {number: 1}},
+      ]
+    });
+
+    assert.throws(function (){
+       sub.trigger('play');
+    });
+
+  });
+
+  it("transition to a undefined", function () {
+    var sub = Subject();
+    var wf = StateKeeper(sub, {
+      play: [
+    {from:"ready",   to: function (){}},
+      ]
+    });
+
+    assert.throws(function (){
+       sub.trigger('play')
+    });
+
+  });
+
 });
 
 describe("State changes implemented as a queue", function () {

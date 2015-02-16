@@ -91,6 +91,7 @@ function StateKeeper (subject, transitions, options) {
           if (test.call(sub, s[i].from, currentState, evt)){
             oldState = currentState;
             currentState = changeState.call(sub, s[i].to, currentState, evt);
+            checkState(currentState);
 
             setImmediate((function (sub, oldState, currentState, evt){
               return function (){
