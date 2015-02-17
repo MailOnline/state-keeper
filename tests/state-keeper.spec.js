@@ -10,7 +10,10 @@ var Subject = function (){
     },
     trigger: function (type, evt){
       cbs[type] && cbs[type].call(this, evt);
-    }
+    },
+    off: function (type){
+      delete cbs[type];
+    },
   };
 };
 
@@ -401,7 +404,7 @@ describe("must throw an error if the state is not valid", function () {
 
 });
 
-describe("State changes implemented as a queue", function () {
+describe("State events implemented as a queue", function () {
   var sub, wf;
 
   beforeEach(function (){
@@ -423,7 +426,7 @@ describe("State changes implemented as a queue", function () {
   });
 
 
-  it("respect the order", function () {
+  it("respect the order", function (done) {
     var s = "";
     wf.on('enter.playing', function (e){
       s += "first ";
@@ -439,6 +442,73 @@ describe("State changes implemented as a queue", function () {
       done();
     }, 10);
 
+  });
+
+});
+
+describe("Timer", function () {
+  var sub, wf;
+
+  beforeEach(function (){
+    sub = Subject();
+
+    wf = StateKeeper(sub, {
+      play: [
+        {from:"ready",   to: "playing", timer_time: 10, timer: "timeout"},
+        {from:"playing", to: "pause"}
+      ],
+      "timer:timeout": [
+        {from:"playing", to: "ready"}
+      ],
+      bounce: [
+        {from:"ready",   to: "1", timer: "ping"},
+      ],
+      "timer:ping": [
+        {from:"1",   to: "2", timer: "pong"},
+      ],
+      "timer:pong": [
+        {from:"2",   to: "ready"},
+      ],
+    });
+
+
+  });
+
+
+  it("times out", function (done) {
+
+    sub.trigger('play');
+    assert.equal(wf.get(), "playing");
+    setTimeout(function (){
+      assert.equal(wf.get(), "ready");
+      done();
+    }, 20);
+
+  });
+
+  it("transition automatically", function (done) {
+    var s = "";
+    wf.on("enter.1", function (){
+      s += "ping";
+    });
+
+    wf.on("enter.2", function (){
+      s += "pong";
+    });
+
+    sub.trigger('bounce');
+    
+    setTimeout(function (){
+      assert.equal(s, "pingpong");
+      assert.equal(wf.get(), "ready");
+      done();
+    }, 10)
+  });
+
+  it("can be destroyed", function () {
+    assert.doesNotThrow(function (){
+      wf.destroy();
+    });
   });
 
 });

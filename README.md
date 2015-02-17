@@ -171,7 +171,7 @@ StateKeeper is able to keep track of many different observables. You can do this
         {from:"all_playing",    to: "video2_playing"}
       ],
       "video2:play": [
-        {from:"ready",          to: "video2_playing",
+        {from:"ready",          to: "video2_playing"},
         {from:"video2_playing", to: "ready"},
         {from:"video1_playing", to: "all_playing"},
         {from:"all_playing",    to: "video1_playing"}
@@ -179,7 +179,53 @@ StateKeeper is able to keep track of many different observables. You can do this
     });
 
 
-In this example I am listening to 2 different video players so that I have available a state that is the combination of them.
+In this example I am listening to 2 different video players so that I have available a state that is the combination of them. The word "timer" in the constructor map is reserved.
+
+Timer
+-----
+Sometimes you really need to transition sequentially through a series of states, or you just need to go back to the initial state after a short time is passed. The timer helps to do so.
+It is a special subject (observable), and you can listen to its event prefixing the event name with "timer:".
+In the transition map you can add a field "timer" with the name of the event, if the transition succeeds the event will be triggered. Example:
+
+    var state = StateKeeper(videoPlayer, {
+      "play": [
+        {from:"ready",     to: "firstPlay", timer: "start"},
+        {from:"playing",   to: "pause"},
+        {from:"pause",     to: "playing"}
+      ],
+      "timer:start": [
+        {from:"firstPlay", to: "playing"}
+      ]
+    });
+
+In this example when the videoPlayer triggers the "play" events the first time (from the state "ready") the state will transition like this:
+
+    "ready" -> "firstPlay" -> "playing"
+
+From that point on the "play" event can be used for transitioning from "play" to "pause" and the other way around. Adding an intermediate state can help to fire a specific event only if you get in a particular state from another:
+
+    wf.on("firstPlay", function (){
+      // this is executed only the first time you play a video
+    });
+
+Another useful use case for the timer is when you need to transition automatically using a timeout:
+
+    var state = StateKeeper(videoPlayer, {
+      "play": [
+        {from:"ready",     to: "waitingAd", timer: "adTimeout", timer_time: 500}
+      ],
+      "adPlay": [
+        {from:"waitingAd", to: "adPlaying"}
+      ],
+      "adEnd": [
+        {from:"adPlaying", to: "contentPlaying"}
+      ],
+      "timer:adTimeout": [
+        {from:"waitingAd", to: "contentPlaying"}
+      ]
+    });
+
+In this case the videoplayer waits an ad to show before the video. After a timeout of 500ms it transition directly to the contentPlaying state.
 
 Cleaning up
 -----------
