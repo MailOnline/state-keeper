@@ -33,7 +33,7 @@ StateKeeper takes as parameters the observable (videoPlayer) and a map of transi
 For each transition (fired by the observable) I have a list of state changes.
 In this example when the subject fires the event "play" I can change the state from "ready" (the default initial state) to "playing", from "playing" to "paused" and the other way around.
 Any other event will be ignored, for example there is no way to getting back to the initial "ready" state.
-Let's see what happen when videoPlayer fires events:
+Let's see what happens when videoPlayer fires events:
 
     videoPlayer.trigger('play');
     state.get() === "playing"
@@ -179,7 +179,7 @@ StateKeeper is able to keep track of many different observables. You can do this
     });
 
 
-In this example I am listening to 2 different video players so that I have available a state that is the combination of them. The word "timer" in the constructor map is reserved.
+In this example I am listening to 2 different video players so that I have available a state that is the combination of both. The word "timer" in the constructor map is reserved.
 
 Timer
 -----
@@ -198,13 +198,13 @@ In the transition map you can add a field "timer" with the name of the event, if
       ]
     });
 
-In this example when the videoPlayer triggers the "play" events the first time (from the state "ready") the state will transition like this:
+In this example when the videoPlayer triggers the "play" event the first time (from the state "ready") the state will transition like this:
 
     "ready" -> "firstPlay" -> "playing"
 
 From that point on the "play" event can be used for transitioning from "play" to "pause" and the other way around. Adding an intermediate state can help to fire a specific event only if you get in a particular state from another:
 
-    wf.on("firstPlay", function (){
+    state.on("firstPlay", function (){
       // this is executed only the first time you play a video
     });
 
@@ -225,7 +225,7 @@ Another useful use case for the timer is when you need to transition automatical
       ]
     });
 
-In this case the videoplayer waits an ad to show before the video. After a timeout of 500ms it transition directly to the contentPlaying state.
+In this case the videoplayer waits for an ad to show before the video. After a timeout of 500ms it transitions directly to the contentPlaying state.
 
 Cleaning up
 -----------
