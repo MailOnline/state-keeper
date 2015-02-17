@@ -123,7 +123,7 @@ function StateKeeper (subject, transitions, options) {
   if (subject.timer){
     throw new Error(s + " the word 'timer' in the subjects map is reserved");
   }
-  
+
   subject.timer = Timer(bind, unbind);
 
   var callbacks = {};
@@ -201,7 +201,7 @@ function StateKeeper (subject, transitions, options) {
   };
 }
 
-if (typeof module.exports === 'object'){
+if (typeof exports === 'object'){
     module.exports = StateKeeper;
 }
 else if (typeof window === 'object'){
