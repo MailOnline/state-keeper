@@ -1,7 +1,7 @@
 {
   "name": "state-keeper",
   "main": "src/state-keeper.js",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "homepage": "https://github.com/MailOnline/state-keeper",
   "authors": [
     "Maurizio Lupo <maurizio.lupo@gmail.com>"
