@@ -8,7 +8,7 @@ var Timer = function (bindMethod, unbindMethod){
   var _trigger = function (type){
     return function (){
       for (var i = 0; i < cbs[type].length; i++){
-        cbs[type][i]()
+        cbs[type][i]();
       }
     };
   };
@@ -17,7 +17,7 @@ var Timer = function (bindMethod, unbindMethod){
 
   out[bindMethod] = function (type, cb){
     if (cbs[type]){
-      cbs[type].push(cb)
+      cbs[type].push(cb);
     }
     else {
       cbs[type] = [cb];
@@ -96,6 +96,8 @@ function StateKeeper (subject, transitions, options) {
   options = options || {};
   var currentState = options.initialState || "ready";
   var oldState;
+  var handler;
+  var handlers_list = [];
   var bind = options.bindMethod || 'on';
   var unbind = options.unbindMethod || 'off';
 
@@ -136,7 +138,7 @@ function StateKeeper (subject, transitions, options) {
     }
     sub = subject[t[0]];
 
-    sub[bind](t[1], (function (s, sub){
+    handler = (function (s, sub){
       return function (evt){
         for(var i = 0; i < s.length; i++){
           if (test.call(sub, s[i].from, currentState, evt)){
@@ -160,12 +162,19 @@ function StateKeeper (subject, transitions, options) {
           }
         }
       };
-    }(transitions[transition], sub) ));
+    }(transitions[transition], sub) );
+
+    // store "eventtype" and "handler" here (in case I need to unbind them all)
+    handlers_list.push([t[1], handler]);
+    sub[bind](t[1], handler); // listening to events
   }
 
   return {
     get: function (){
       return currentState;
+    },
+    set: function (s){
+      currentState = s;
     },
     on: function (state, cb){
       if (!cb){
@@ -187,15 +196,11 @@ function StateKeeper (subject, transitions, options) {
       }
     },
     destroy: function (){
-      var t;
-      for (var transition in transitions){
-        t = transition.split(':');
-        if (t.length < 2){
-          t.unshift('default');
-        }
-        sub = subject[t[0]];
-
-        sub[unbind](t[1]);
+      var i, eventtype, func;
+      for (i = 0; i< handlers_list.length;i++){
+        eventtype = handlers_list[i][0];
+        func = handlers_list[i][1];
+        sub[unbind](eventtype, func);
       }
     }
   };

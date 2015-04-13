@@ -248,3 +248,61 @@ StateKeeper uses '.on' to listen for events on the subject. You can change the d
       bindMathod: "addEventListener",
       unbindMethod: "removeEventListener"
     });
+
+Testing StateKeeper
+-------------------
+It is a good idea testing the StateKeeper setup (using your favourite unit test suite). For make things easier I suggest you to test transition by transition.
+You can do that setting the state by hand:
+
+    state.set("play");
+
+And using a very simple observable implementation:
+
+    var Subject = require('state-keeper/src/subject');
+
+or
+
+    var Subject = StateKeeper.Subject;
+
+Then you can set it up using:
+
+    var subject = Subject();
+
+You can pass the bind and unbind method names (default on, off):
+
+    var subject = Subject('addEventListener', 'removeEventListener');
+
+Subject has a very simple api:
+
+    subject.on("test", function (evt){
+      console.log(evt);
+    });
+
+    subject.trigger('test', {hello: "world!"});
+
+This will print '{hello: "world!"}'.
+So this is an example on how we can test a single transition, let's start from a state machine configured:
+
+    function getstate(videoPlayer){
+      var state = StateKeeper(videoPlayer, {
+        play: [
+          {from:"ready", to:"playing"},
+          {from:"playing", to:"paused"},
+          {from:"paused", to:"playing"}
+        ]
+      });
+      return state;
+    }
+
+I can inject a fake videoPlayer:
+
+    var videoPlayer = Subject();
+    var state = getstate(videoPlayer);
+
+Then I test a specific transition:
+
+    state.set("paused"); // I start from this state
+    videoPlayer.trigger("play");
+    assert(state.get(), "playing");
+
+Easy as that!

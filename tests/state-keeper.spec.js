@@ -1,21 +1,8 @@
 var StateKeeper = require('../src/state-keeper');
+var Subject = require('../src/subject');
+
 var assert = require('chai').assert;
-require("setimmediate")
-// mock
-var Subject = function (){
-  var cbs = {};
-  return {
-    on: function (type, cb){
-      cbs[type] = cb;
-    },
-    trigger: function (type, evt){
-      cbs[type] && cbs[type].call(this, evt);
-    },
-    off: function (type){
-      delete cbs[type];
-    },
-  };
-};
+require("setimmediate");
 
 describe("workflow machine", function () {
   var subject;
@@ -397,7 +384,7 @@ describe("must throw an error if the state is not valid", function () {
     });
 
     assert.throws(function (){
-       sub.trigger('play')
+       sub.trigger('play');
     });
 
   });
@@ -497,12 +484,12 @@ describe("Timer", function () {
     });
 
     sub.trigger('bounce');
-    
+
     setTimeout(function (){
       assert.equal(s, "pingpong");
       assert.equal(wf.get(), "ready");
       done();
-    }, 10)
+    }, 10);
   });
 
   it("can be destroyed", function () {
