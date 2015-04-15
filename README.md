@@ -310,26 +310,26 @@ If you use timers for transitioning automatically you can use [sinonjs fake time
 
     module("test transition", {
     	setup: function (){
-        this.clock = sinon.useFakeTimers();
-        // useFakeTimers does not fake setImmediate. I make it by hand
-        this.setImmediateOriginal = window.setImmediate;
-        window.setImmediate = function(fn) {
-          setTimeout(fn, 0);
-        };
+          this.clock = sinon.useFakeTimers();
+          // useFakeTimers does not fake setImmediate. I make it by hand
+          this.setImmediateOriginal = window.setImmediate;
+          window.setImmediate = function(fn) {
+            setTimeout(fn, 0);
+          };
 
-        this.videoPlayer = Subject();
-        this.state = getstate(this.videoPlayer);
+          this.videoPlayer = Subject();
+          this.state = getstate(this.videoPlayer);
     	},
     	tearDown: function (){
-        this.clock.restore();
-        window.setImmediate = this.setImmediateOriginal;
+          this.clock.restore();
+          window.setImmediate = this.setImmediateOriginal;
     	}
     } );
 
     test("from playing to paused", function() {
-      this.state.set("playing"); // I start from this state
-      this.videoPlayer.trigger("play");
-      assert(this.state.get(), "paused");
-      this.clock.tick(60);
-      assert(this.state.get(), "standby"); // after 60ms I transition to this state
+        this.state.set("playing"); // I start from this state
+        this.videoPlayer.trigger("play");
+        assert(this.state.get(), "paused");
+        this.clock.tick(60);
+        assert(this.state.get(), "standby"); // after 60ms I transition to this state
     });
