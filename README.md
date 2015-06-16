@@ -181,6 +181,26 @@ StateKeeper is able to keep track of many different observables. You can do this
 
 In this example I am listening to 2 different video players so that I have available a state that is the combination of both. The word "timer" in the constructor map is reserved.
 
+More than one event
+-------------------
+If you need to you can perform the same transition using different events. In this case you will separate the events using the coma:
+
+    var state = StateKeeper(videoPlayer, {
+      "playcontent,playads": [
+        {from:"ready",          to: "video1_playing"
+      ],
+      // ...
+    });
+
+You can do the same observing more than one object:
+
+    var state = StateKeeper({video1: videoPlayer1, video2: videoplayer2}, {
+      "video1:play,video2:play": [
+        {from:"ready",          to: "video_playing",
+      ],
+      // ...
+    });
+
 Timer
 -----
 Sometimes you really need to transition sequentially through a series of states, or you just need to go back to the initial state after a short time is passed. The timer helps to do so.

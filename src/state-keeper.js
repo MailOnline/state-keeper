@@ -92,11 +92,12 @@ function changeState(to, st, evt){
   }
 }
 
-function StateKeeper (subject, transitions, options) {
+function StateKeeper (subject, transition_groups, options) {
   options = options || {};
   var currentState = options.initialState || "ready";
   var oldState;
   var handler;
+  var transition, transitions;
   var handlers_list = [];
   var bind = options.bindMethod || 'on';
   var unbind = options.unbindMethod || 'off';
@@ -131,42 +132,48 @@ function StateKeeper (subject, transitions, options) {
   var callbacks = {};
   var queue = [];
 
-  for (var transition in transitions){
-    t = transition.split(':');
-    if (t.length < 2){
-      t.unshift('default');
-    }
-    sub = subject[t[0]];
+  for (var transition_group in transition_groups){
+    transitions = transition_group.split(/[\s,]+/);
 
-    handler = (function (s, sub){
-      return function (evt){
-        for(var i = 0; i < s.length; i++){
-          if (test.call(sub, s[i].from, currentState, evt)){
-            subject.timer.reset();
-            oldState = currentState;
-            currentState = changeState.call(sub, s[i].to, currentState, evt);
-            checkState(currentState);
+    for (var j = 0; j < transitions.length; j++){
+      transition = transitions[j];
 
-            setImmediate((function (sub, oldState, currentState, evt){
-              return function (){
-                run.call(sub, 'leave', oldState, evt);
-                run.call(sub, 'enter', currentState, evt);
-              };
-            }(sub, oldState, currentState, evt)));
+      t = transition.split(':');
+      if (t.length < 2){
+        t.unshift('default');
+      }
+      sub = subject[t[0]];
 
-            if (s[i].timer){
-              subject.timer.trigger(s[i].timer, s[i].timer_time);
+      handler = (function (s, sub){
+        return function (evt){
+          for(var i = 0; i < s.length; i++){
+            if (test.call(sub, s[i].from, currentState, evt)){
+              subject.timer.reset();
+              oldState = currentState;
+              currentState = changeState.call(sub, s[i].to, currentState, evt);
+              checkState(currentState);
+
+              setImmediate((function (sub, oldState, currentState, evt){
+                return function (){
+                  run.call(sub, 'leave', oldState, evt);
+                  run.call(sub, 'enter', currentState, evt);
+                };
+              }(sub, oldState, currentState, evt)));
+
+              if (s[i].timer){
+                subject.timer.trigger(s[i].timer, s[i].timer_time);
+              }
+
+              break;
             }
-
-            break;
           }
-        }
-      };
-    }(transitions[transition], sub) );
+        };
+      }(transition_groups[transition_group], sub) );
 
-    // store "eventtype" and "handler" here (in case I need to unbind them all)
-    handlers_list.push([t[1], handler]);
-    sub[bind](t[1], handler); // listening to events
+      // store "eventtype" and "handler" here (in case I need to unbind them all)
+      handlers_list.push([t[1], handler]);
+      sub[bind](t[1], handler); // listening to events
+    }
   }
 
   return {

@@ -499,3 +499,37 @@ describe("Timer", function () {
   });
 
 });
+
+
+describe("more than one events leads to the same transition", function () {
+  var video1, video2;
+  var wf;
+
+  beforeEach(function (){
+    video1 = Subject();
+    video2 = Subject();
+
+    wf = StateKeeper({video1: video1, video2: video2}, {
+      "video1:play, video2:play" : [
+        {
+          from: 'ready',
+          to: "playing"
+        },
+        {
+          from: 'playing',
+          to: "ready"
+        }
+      ]
+    });
+  });
+
+
+  it("get the input from 1 subjects", function () {
+    assert.equal(wf.get(), 'ready');
+    video1.trigger('play');
+    assert.equal(wf.get(), 'playing');
+    video2.trigger('play');
+    assert.equal(wf.get(), 'ready');
+  });
+
+});
