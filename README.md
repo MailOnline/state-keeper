@@ -90,12 +90,10 @@ There are few cases where you want be able to define more complicated transition
         {from:"playing", to:"paused"},
         {from:"paused", to:"playing"}
       ],
-      reset: [
-        {from: new RegExp('.*'), to: 'ready'}
-      ]
+      reset: {from: new RegExp('.*'), to: 'ready'}
     });
 
-In this example if the videoPlayer fires the "reset" event I want to go back to the initial "ready" state whatever the current state is.
+In this example if the videoPlayer fires the "reset" event I want to go back to the initial "ready" state whatever the current state is. For this transition I have used an object instead of the usual array of objects, I can do it when I have only one possible transition from one event.
 I can also use a function to do even more complex stuff:
 
     var state = StateKeeper(videoPlayer, {
@@ -246,6 +244,24 @@ Another useful use case for the timer is when you need to transition automatical
     });
 
 In this case the videoplayer waits for an ad to show before the video. After a timeout of 500ms it transitions directly to the contentPlaying state.
+
+Last but not least, it may happen you need to trigger a state change without having a specific transition. You can do that defining a timer with an interval. This one will fire with a specific interval until the next state change:
+
+    var state = StateKeeper(videoplayer, {
+      play: [
+        {from:"ready", to: "loadVideo", timer_interval: 10, timer: "contentReady"}
+      ],
+      "timer:contentReady": [
+        {
+          from:function (st){
+            return st === "loadVideo" && videoplayer.isReady;
+          },
+          to: "playing"
+        }
+      ]
+    });
+
+In the previous example the timer "contentReady" will fire many times until videoplayer.isReady is true and it will be possible to transition to "playing".
 
 Cleaning up
 -----------

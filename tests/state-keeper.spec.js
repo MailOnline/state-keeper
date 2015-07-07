@@ -29,24 +29,18 @@ describe("workflow machine", function () {
           to: "playing"
         },
       ],
-      pause: [
-        {
-          from: "playing",
-          to: "paused"
-        }
-      ],
-      end: [
-        {
-          from: /.*/,
-          to: 'ready'
-        }
-      ],
-      screenshot: [
-        {
-          from: "playing",
-          to: "playing"
-        }
-      ]
+      pause: {
+        from: "playing",
+        to: "paused"
+      },
+      end: {
+        from: /.*/,
+        to: 'ready'
+      },
+      screenshot:{
+        from: "playing",
+        to: "playing"
+      }
     });
 
     wf.on('playing', function (){
@@ -239,6 +233,12 @@ describe("workflow machine", function () {
       done();
     });
     subject.trigger('play');
+  });
+
+  it("can be destroyed", function () {
+    assert.doesNotThrow(function (){
+      wf.destroy();
+    });
   });
 
 });
@@ -492,11 +492,44 @@ describe("Timer", function () {
     }, 10);
   });
 
-  it("can be destroyed", function () {
-    assert.doesNotThrow(function (){
-      wf.destroy();
+});
+
+describe("Timer interval", function () {
+  var sub, wf, isReady;
+
+  beforeEach(function (){
+    sub = Subject();
+
+    wf = StateKeeper(sub, {
+      play: [
+        {from:"ready", to: "loadVideo", timer_interval: 10, timer: "contentReady"}
+      ],
+      "timer:contentReady": [
+        {
+          from:function (st){
+            return st === "loadVideo" && isReady;
+          },
+          to: "playing"
+        }
+      ]
     });
   });
+
+
+  it("times out", function (done) {
+    sub.trigger('play');
+    assert.equal(wf.get(), "loadVideo");
+    setTimeout(function (){
+      assert.equal(wf.get(), "loadVideo");
+      isReady = true;
+      setTimeout(function (){
+        assert.equal(wf.get(), "playing");
+        done();
+      }, 20);
+    }, 20);
+
+  });
+
 
 });
 

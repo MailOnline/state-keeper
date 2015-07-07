@@ -29,10 +29,13 @@ var Timer = function (bindMethod, unbindMethod){
     clearTimeout(toHandler);
   };
 
-  out.trigger = function (type, timeout){
+  out.trigger = function (type, timeout, interval){
     if (cbs[type]){
       if (timeout){
         toHandler = setTimeout(_trigger(type), timeout);
+      }
+      else if (interval){
+        toHandler = setInterval(_trigger(type), interval);
       }
       else {
         setImmediate(_trigger(type));
@@ -42,6 +45,7 @@ var Timer = function (bindMethod, unbindMethod){
 
   out.reset = function (){
     clearTimeout(toHandler);
+    clearInterval(toHandler);
   };
 
   return out;
@@ -145,6 +149,7 @@ function StateKeeper (subject, transition_groups, options) {
       sub = subject[t[0]];
 
       handler = (function (s, sub){
+        s = typeof s.length === "undefined" ? [s] : s;
         return function (evt){
           for(var i = 0; i < s.length; i++){
             if (test.call(sub, s[i].from, currentState, evt)){
@@ -161,7 +166,7 @@ function StateKeeper (subject, transition_groups, options) {
               }(sub, oldState, currentState, evt)));
 
               if (s[i].timer){
-                subject.timer.trigger(s[i].timer, s[i].timer_time);
+                subject.timer.trigger(s[i].timer, s[i].timer_time, s[i].timer_interval);
               }
 
               break;
