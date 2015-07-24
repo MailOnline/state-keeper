@@ -158,12 +158,22 @@ function StateKeeper (subject, transition_groups, options) {
               currentState = changeState.call(sub, s[i].to, currentState, evt);
               checkState(currentState);
 
-              setImmediate((function (sub, oldState, currentState, evt){
-                return function (){
-                  run.call(sub, 'leave', oldState, evt);
-                  run.call(sub, 'enter', currentState, evt);
-                };
-              }(sub, oldState, currentState, evt)));
+              if(getStateString(oldState) === getStateString(currentState)){
+                setImmediate((function (sub, oldState, currentState, evt){
+                  return function (){
+                    run.call(sub, 'stay', currentState, evt);
+                  };
+                }(sub, oldState, currentState, evt)));
+              }
+              else {
+                setImmediate((function (sub, oldState, currentState, evt){
+                  return function (){
+                    run.call(sub, 'leave', oldState, evt);
+                    run.call(sub, 'enter', currentState, evt);
+                  };
+                }(sub, oldState, currentState, evt)));
+              }
+
 
               if (s[i].timer){
                 subject.timer.trigger(s[i].timer, s[i].timer_time, s[i].timer_interval);

@@ -139,32 +139,6 @@ describe("workflow machine", function () {
     }, 10);
   });
 
-  it("must transition multiple time", function (done) {
-    subject.trigger('play');
-    subject.trigger('screenshot');
-    subject.trigger('screenshot');
-
-    setTimeout(function (){
-      assert.equal(wf.get(), 'playing');
-      assert.equal(counter_play, 3);
-      done();
-    }, 10);
-  });
-
-  it("must transition multiple time", function (done) {
-    subject.trigger('play');
-    subject.trigger('screenshot');
-    subject.trigger('screenshot');
-
-    setTimeout(function (){
-      assert.equal(wf.get(), 'playing');
-      assert.equal(counter_play, 3);
-      done();
-    }, 10);
-
-  });
-
-
   it("must pass correct state", function (done) {
     wf.on("playing", function (evt){
       assert.equal(evt.type, 'enter');
@@ -563,6 +537,51 @@ describe("more than one events leads to the same transition", function () {
     assert.equal(wf.get(), 'playing');
     video2.trigger('play');
     assert.equal(wf.get(), 'ready');
+  });
+
+});
+
+describe("transition to the same state", function () {
+  var video;
+  var wf;
+
+  beforeEach(function (){
+    video = Subject();
+
+    wf = StateKeeper(video, {
+      play : [
+        {
+          from: 'ready',
+          to: "playing"
+        },
+        {
+          from: 'playing',
+          to: "playing"
+        }
+      ]
+    });
+  });
+
+  it("don't fire event twice", function (done) {
+    var counter_enter = 0;
+    var counter_stay = 0;
+    wf.on('enter.playing', function (){
+      counter_enter++;
+    });
+
+    wf.on('stay.playing', function (){
+      counter_stay++;
+    });
+
+    video.trigger('play');
+    assert.equal(wf.get(), 'playing');
+    video.trigger('play');
+
+    setTimeout(function (){
+      assert.equal(counter_enter, 1);
+      assert.equal(counter_stay, 1);
+      done();
+    }, 10);
   });
 
 });

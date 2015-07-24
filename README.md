@@ -60,12 +60,14 @@ You can also do something else when you are leaving a state:
     });
 
 With "on" you can attach a function when the state changes. A stateKeeper instance fires an event called "enter.statename" when it enters a new state and "leave.statename" when it is leaving a state.
+If you transition from a state to another with the same name a special event will be fired: "stay.statename".
 There are a few shortcuts available:
 
   - "*.statename" will run the function for "enter.statename" and "leave.statename"
   - "enter.*" will run the function every time it transitions to a new state
-  - "leave.*" will run the function every time it is leaving a state
-  - "*.*" will run the function for any state, when it is entering and leaving
+  - "leave.*" will run the function every time is leaving a state
+  - "stay.*" will run the function every time is transitioning to the same state
+  - "*.*" will run the function for any state, when it is entering, leaving and staying
   - omitting the first argument is equivalent to using "*.*"
   - "statename" is the same as "enter.statename"
   - "*" is the same as "enter.*"
