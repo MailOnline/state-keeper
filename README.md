@@ -393,6 +393,6 @@ This function has as arguments the old and the new state, the event (and subject
 
 This example will output helpful logs like:
 
-   ready -> play -> playing
-   playing -> play -> paused
-   paused -> play -> playing
+   - ready -> play -> playing
+   - playing -> play -> paused
+   - paused -> play -> playing
