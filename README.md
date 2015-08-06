@@ -371,3 +371,28 @@ If you use timers for transitioning automatically you can use [sinonjs fake time
         this.clock.tick(60);
         assert(this.state.get(), "standby"); // after 60ms I transition to this state
     });
+
+Debugging transitions
+---------------------
+In complex configurations it might be difficult to trace and debug state changes. For example in cases where we can't predict exactly the sequence of events. For this reason you can add a special function "onTransition" that will be executed synchronously every time a transition occurs:
+
+    var state = StateKeeper(videoPlayer, {
+      play: [
+        {from:"ready", to:"playing"},
+        {from:"playing", to:"paused"},
+        {from:"paused", to:"playing"}
+      ]
+    },
+    {
+      onTransition: function (oldState, currentState, evtName, evt){
+        console.log(oldState + " -> " + evtName + " -> " + currentState);
+      }
+    });
+
+This function has as arguments the old and the new state, the event (and subject) that triggered the transition and the evt argument passed to the event handler.
+
+This example will output helpful logs like:
+
+   ready -> play -> playing
+   playing -> play -> paused
+   paused -> play -> playing

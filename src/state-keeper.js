@@ -99,6 +99,7 @@ function changeState(to, st, evt){
 function StateKeeper (subject, transition_groups, options) {
   options = options || {};
   var currentState = options.initialState || "ready";
+  var onTransition = options.onTransition || function (){};
   var oldState;
   var handler;
   var transition, transitions;
@@ -148,7 +149,7 @@ function StateKeeper (subject, transition_groups, options) {
       }
       sub = subject[t[0]];
 
-      handler = (function (s, sub){
+      handler = (function (transition, s, sub){
         s = typeof s.length === "undefined" ? [s] : s;
         return function (evt){
           for(var i = 0; i < s.length; i++){
@@ -157,6 +158,8 @@ function StateKeeper (subject, transition_groups, options) {
               oldState = currentState;
               currentState = changeState.call(sub, s[i].to, currentState, evt);
               checkState(currentState);
+
+              onTransition(oldState, currentState, transition, evt); // useful for debug
 
               if(getStateString(oldState) === getStateString(currentState)){
                 setImmediate((function (sub, oldState, currentState, evt){
@@ -183,7 +186,7 @@ function StateKeeper (subject, transition_groups, options) {
             }
           }
         };
-      }(transition_groups[transition_group], sub) );
+      }(transition, transition_groups[transition_group], sub) );
 
       // store "eventtype" and "handler" here (in case I need to unbind them all)
       handlers_list.push([t[1], handler]);
