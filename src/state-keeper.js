@@ -4,6 +4,7 @@
 var Timer = function (bindMethod, unbindMethod){
   var cbs = {};
   var toHandler;
+  var tiHandler;
 
   var _trigger = function (type){
     return function (){
@@ -27,6 +28,7 @@ var Timer = function (bindMethod, unbindMethod){
   out[unbindMethod] = function (type){
     delete cbs[type];
     clearTimeout(toHandler);
+    clearTimeout(tiHandler);
   };
 
   out.trigger = function (type, timeout, interval){
@@ -35,7 +37,7 @@ var Timer = function (bindMethod, unbindMethod){
         toHandler = setTimeout(_trigger(type), timeout);
       }
       else if (interval){
-        toHandler = setInterval(_trigger(type), interval);
+        tiHandler = setInterval(_trigger(type), interval);
       }
       else {
         setImmediate(_trigger(type));
@@ -45,7 +47,7 @@ var Timer = function (bindMethod, unbindMethod){
 
   out.reset = function (){
     clearTimeout(toHandler);
-    clearInterval(toHandler);
+    clearInterval(tiHandler);
   };
 
   return out;
