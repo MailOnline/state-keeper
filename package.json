@@ -1,17 +1,20 @@
 {
   "name": "state-keeper",
-  "version": "1.1.1",
+  "version": "1.1.3",
   "description": "state-keeper keeps track of the state of one or more observables",
   "main": "src/state-keeper.js",
   "scripts": {
+    "start": "rm -rf bin; mkdir bin; ./node_modules/.bin/browserify --standalone StateKeeper -e src/state-keeper.js -o bin/state-keeper.js",
     "test": "./node_modules/mocha/bin/mocha tests/*.js"
   },
   "repository": "git@github.com:MailOnline/state-keeper.git",
   "author": "Maurizio Lupo <maurizio.lupo@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "browserify": "^13.0.0",
     "chai": "^1.10.0",
-    "mocha": "^2.1.0"
+    "mocha": "^2.1.0",
+    "mversion": "^1.10.1"
   },
   "dependencies": {
     "setimmediate": "^1.0.2"

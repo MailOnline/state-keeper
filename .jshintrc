@@ -1,0 +1,20 @@
+{
+  "browser": true,
+  "browserify": true,
+  "indent": 2,
+  "maxlen": 200,
+  "mocha": true,
+  "newcap": true,
+  "noarg": true,
+  "noempty": true,
+  "nonew": true,
+  "strict": false,
+  "sub": true,
+  "trailing": true,
+  "undef": true,
+  "unused": true,
+  "globals":{
+    "assert": true,
+    "sinon": true
+  }
+}
