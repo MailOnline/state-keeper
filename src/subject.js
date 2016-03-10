@@ -1,47 +1,57 @@
-var Subject = function (bindMethod, unbindMethod){
-  var cbs = {};
-  bindMethod = bindMethod || 'on';
-  unbindMethod = unbindMethod || 'off';
+(function (){
 
-  var out = {};
+  var Subject = function (bindMethod, unbindMethod){
+    var cbs = {};
 
-  out[bindMethod] = function (type, cb){
-    if (type in cbs){
-      cbs[type].push(cb);
-    }
-    else {
-      cbs[type] = [cb];
-    }
-  };
+    bindMethod = bindMethod || 'on';
+    unbindMethod = unbindMethod || 'off';
 
-  out[unbindMethod] = function (type, func){
-    var i, out;
-    if (type in cbs){
-      if (typeof func == "undefined"){
-        delete cbs[type];
+    var out = {};
+
+    out[bindMethod] = function (type, cb){
+      if (type in cbs){
+        cbs[type].push(cb);
       }
       else {
-        out = [];
-        for (i = 0;i < cbs[type].length ; i++){
-          if (cbs[type][i] !== func){
-            out.push(cbs[type][i]);
-          }
+        cbs[type] = [cb];
+      }
+    };
+
+    out[unbindMethod] = function (type, func){
+      var i, out;
+      if (type in cbs){
+        if (typeof func == "undefined"){
+          delete cbs[type];
         }
-        cbs[type] = out;
+        else {
+          out = [];
+          for (i = 0;i < cbs[type].length ; i++){
+            if (cbs[type][i] !== func){
+              out.push(cbs[type][i]);
+            }
+          }
+          cbs[type] = out;
+        }
       }
-    }
+    };
+
+    out.trigger = function (type, evt){
+      var i;
+      if (type in cbs){
+        for (i = 0;i < cbs[type].length ; i++){
+          cbs[type][i].call(this, evt);
+        }
+      }
+    };
+
+    return out;
   };
 
-  out.trigger = function (type, evt){
-    var i;
-    if (type in cbs){
-      for (i = 0;i < cbs[type].length ; i++){
-        cbs[type][i].call(this, evt);
-      }
-    }
-  };
+  if (typeof exports === 'object'){
+      module.exports = Subject;
+  }
+  else if (typeof window === 'object'){
+      window.StateKeeper.Subject = Subject;
+  }
 
-  return out;
-};
-
-module.exports = Subject;
+}());

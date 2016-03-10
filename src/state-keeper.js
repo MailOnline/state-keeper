@@ -1,11 +1,102 @@
+(function (){
 "use strict";
 
-var utils = require('./utils');
-var isString = utils.isString;
-var setImmediate = utils.setImmediate;
-var Timer = require('./timer');
+var Timer = function (bindMethod, unbindMethod){
+  var cbs = {};
+  var toHandler;
+  var tiHandler;
 
-module.exports = StateKeeper;
+  var _trigger = function (type){
+    return function (){
+      for (var i = 0; i < cbs[type].length; i++){
+        cbs[type][i]();
+      }
+    };
+  };
+
+  var out = {};
+
+  out[bindMethod] = function (type, cb){
+    if (cbs[type]){
+      cbs[type].push(cb);
+    }
+    else {
+      cbs[type] = [cb];
+    }
+  };
+
+  out[unbindMethod] = function (type){
+    delete cbs[type];
+    clearTimeout(toHandler);
+    clearTimeout(tiHandler);
+  };
+
+  out.trigger = function (type, timeout, interval){
+    if (cbs[type]){
+      if (timeout){
+        toHandler = setTimeout(_trigger(type), timeout);
+      }
+      else if (interval){
+        tiHandler = setInterval(_trigger(type), interval);
+      }
+      else {
+        setImmediate(_trigger(type));
+      }
+    }
+  };
+
+  out.reset = function (){
+    clearTimeout(toHandler);
+    clearInterval(tiHandler);
+  };
+
+  return out;
+
+};
+
+function isString(s){
+  return (typeof s === "string" ) || (s instanceof String);
+}
+
+function isValidState(s){
+  return (isString(s)) || ((typeof s === "object") && ("name" in s));
+}
+
+function checkState(s){
+  if (!isValidState(s)) throw new Error(s + " not a valid state");
+}
+
+function getStateString(s){
+  return isString(s) ? s : s.name;
+}
+
+function test(from, st, evt){
+  var stateName = getStateString(st);
+  if (from instanceof RegExp){ // regexp
+    return from.test(stateName);
+  }
+  else if (typeof from === "function") {
+    return from.call(this, st, evt);
+  }
+  else if (isString(from)){
+    return from === stateName;
+  }
+  else {
+    throw new Error(from + " (from) can be either a string, a regular expression or a function");
+  }
+}
+
+function changeState(to, st, evt){
+  if (typeof to === "function") {
+    return to.call(this, st, evt);
+  }
+  else if (isValidState(to)){
+    return to;
+  }
+  else {
+    throw new Error(to + " (to) can be either a string, a function or a state object");
+  }
+}
 
 function StateKeeper (subject, transition_groups, options) {
   options = options || {};
@@ -40,7 +131,7 @@ function StateKeeper (subject, transition_groups, options) {
   }
 
   if (subject.timer){
-    throw new Error(subject + " the word 'timer' in the subjects map is reserved");
+    throw new Error(s + " the word 'timer' in the subjects map is reserved");
   }
 
   subject.timer = Timer(bind, unbind);
@@ -142,42 +233,12 @@ function StateKeeper (subject, transition_groups, options) {
   };
 }
 
-function isValidState(s){
-    return (isString(s)) || ((typeof s === "object") && ("name" in s));
+if (typeof exports === 'object'){
+    module.exports = StateKeeper;
+}
+else if (typeof window === 'object'){
+    // Expose StateKeeper to the browser global object
+    window.StateKeeper = StateKeeper;
 }
 
-function checkState(s){
-  if (!isValidState(s)) throw new Error(s + " not a valid state");
-}
-
-function getStateString(s){
-  return isString(s) ? s : s.name;
-}
-
-function test(from, st, evt){
-  var stateName = getStateString(st);
-  if (from instanceof RegExp){ // regexp
-    return from.test(stateName);
-  }
-  else if (typeof from === "function") {
-    return from.call(this, st, evt);
-  }
-  else if (isString(from)){
-    return from === stateName;
-  }
-  else {
-    throw new Error(from + " (from) can be either a string, a regular expression or a function");
-  }
-}
-
-function changeState(to, st, evt){
-  if (typeof to === "function") {
-    return to.call(this, st, evt);
-  }
-  else if (isValidState(to)){
-    return to;
-  }
-  else {
-    throw new Error(to + " (to) can be either a string, a function or a state object");
-  }
-}
+}());
