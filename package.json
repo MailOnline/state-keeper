@@ -11,9 +11,9 @@
   "author": "Maurizio Lupo <maurizio.lupo@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "browserify": "^13.0.0",
-    "chai": "^1.10.0",
-    "mocha": "^2.1.0",
+    "browserify": "^16.2.2",
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0",
     "mversion": "^1.10.1"
   },
   "dependencies": {
