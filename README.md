@@ -1,7 +1,7 @@
 StateKeeper
 ===========
 
-[![Build Status](https://travis-ci.org/MailOnline/state-keeper.svg?branch=master)](https://travis-ci.org/MailOnline/state-keeper)
+[![Build Status](https://travis-ci.org/MailOnline/state-keeper.svg?branch=master)](https://travis-ci.org/MailOnline/state-keeper) [![Greenkeeper badge](https://badges.greenkeeper.io/MailOnline/state-keeper.svg)](https://greenkeeper.io/)
 
 StateKeeper is a simple but customizable state machine. Compared to other state machines, it works in a slightly different way:
 It observes one or more observables (sorry for the pun) and uses their events to transition to different states (a state can be as simple as a string).
