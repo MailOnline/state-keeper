@@ -14,7 +14,7 @@
     "browserify": "^13.0.0",
     "chai": "^1.10.0",
     "mocha": "^2.1.0",
-    "mversion": "^1.10.1"
+    "mversion": "^2.0.0"
   },
   "dependencies": {
     "setimmediate": "^1.0.2"
